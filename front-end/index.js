@@ -1,25 +1,23 @@
 const myDiv = document.getElementById('main');
-
 const button = document.getElementById('myButton');
 
-const ipField = document.createElement('input')
+const ipField = document.createElement('input');
 ipField.setAttribute('type','text');
-ipField.setAttribute('class','basicInput')
+ipField.setAttribute('class','basicInput');
 ipField.setAttribute('required','');
 ipField.setAttribute('pattern','^(?!\s*$).+');
 
 const newTask = document.getElementById('newTask');
-
 newTask.focus();
 
 let task=[];
 
 async function get(){
-    const Response= await fetch('http://localhost:3000/');
-    // console.log(Response);
-    const data= await Response.json();
-    task=data;
-    // console.log(data)
+    const response= await fetch('http://localhost:3000/todo');
+    const todo= await response.json();
+    task=todo.data;
+    const {data,...resp} = todo;
+    console.log(resp);
     display(task);
 }
 
@@ -28,47 +26,38 @@ async function put(id){
         task:ipField.value
     }
     ipField.value=null;
-    const Response= await fetch(`http://localhost:3000/${id}`,{
+    const response= await fetch(`http://localhost:3000/${id}`,{
         method:'put',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify(upData)
     });
-    const data= await Response.json();
-    // task=data;
+    const data= await response.json();
     console.log(data);
     get();
-    // display(task);
 }
 
 async function post(individualTask){
-    const Response= await fetch('http://localhost:3000/',{
+    const response= await fetch('http://localhost:3000/',{
         method:'post',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify(individualTask)
     });
-    const data= await Response.json();
-    // task=data;
+    const data= await response.json();
     console.log(data);
     get();
-    // display(task);
 }
 
 async function del(id){
-    const Response= await fetch(`http://localhost:3000/${id}`,{
+    const response= await fetch(`http://localhost:3000/${id}`,{
         method:'delete',
         headers:{'Content-Type':'application/json'},
     });
-    const data= await Response.json();
-    // task=data;
+    const data= await response.json();
     console.log(data);
     get();
-    // display(task);
 }
 
 function doneFunction(){
-    // console.log(this.id);
-    // task.splice(this.id,1);
-    // display(task);
     del(this.id);
     newTask.focus();
 }
@@ -83,9 +72,6 @@ function saveFunction(){
     if(isValid)
     {
         put(ipField.id);
-        // task[this.id].task=ipField.value;
-        // display(task);
-        // newTask.focus();
     }
     else{
         ipField.reportValidity();
@@ -101,7 +87,6 @@ function display(task,eId=null){
     myDiv.innerHTML=null;
     newTask.value=null;
     task.forEach(element => {
-        // console.log('ok');
         const ulTag=document.createElement('ul');
         const liTag=document.createElement('li');
         liTag.setAttribute('style','list-style-type:decimal');
@@ -149,7 +134,6 @@ function display(task,eId=null){
                 eCancel.addEventListener('click',cancelFunction);
                 ipField.focus();
                 ipField.select();
-                // id++;
             } ()) ;
         }
     });
@@ -164,52 +148,13 @@ function addElement(){
             task:document.getElementById('newTask').value
         };
         post(individualTask);
-        // individualTask[individualTask.length]=document.getElementById('newTask').value;
-        // individualTask.push(i);
-        // console.log(individualTask);
-        // console.log(JSON.stringify(individualTask))
-        // task[task.length]=individualTask;
-        // console.log(JSON.stringify(task));
-        // console.log(task)
-        // display(task);
     }
     else{
         newTask.reportValidity();
     }
     newTask.focus();
-    // i++;
-    // const m = document.createElement('ul');
-    // const k = document.createElement('li')
-    // k.setAttribute('style','list-style: none')
-    // // k.style.color='blue';
-    // k.innerText=document.getElementById('newTask').value
-    // k.setAttribute('id',`${i}`) 
-    
-
-
 }
 
-newTask.addEventListener('keydown',(event)=>{if(event.keyCode==13){event.preventDefault();addElement();}}) 
+newTask.addEventListener('keydown',(event)=>{if(event.keyCode==13){event.preventDefault();addElement();}});
 button.addEventListener('click',addElement);
-
-
-// fetch('/To-do/data.json')
-// .then(Response=>
-//      Response.json().then(data=>
-//         {
-//             task=data.task;
-//             display(task);
-//         }))
-// .catch(err=>console.log("Oops! Error occured"));
-
-
-// (async function fetchData(){
-//     const Response= await fetch('http://localhost:3000/');
-//     console.log(Response);
-//     const data= await Response.json();
-//     task=data;
-//     // console.log(data)
-//     // display(task);
-// }());
-get()
-// console.log(task);
+get();
